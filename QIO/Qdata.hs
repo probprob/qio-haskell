@@ -53,9 +53,10 @@ condQRec [] [] = mempty
 condQRec (q:qs) (u:us) = (condQ q u) `mappend` condQRec qs us
 
 -- | Quantum integers are of a fixed length, which is defined by this constant.
--- Currently, this is set to 4.
+-- now it is set to 5.
+
 qIntSize :: Int
-qIntSize = 4
+qIntSize = 5
 
 -- | A Quantum integer is a wrapper around a fixed-length list of qubits
 newtype QInt = QInt [Qbit] deriving Show

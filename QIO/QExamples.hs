@@ -17,6 +17,12 @@ q0 = mkQ False
 q1 :: QIO Qbit
 q1  =  mkQ True
 
+-- | (Paper)
+hqw :: QIO Bool
+hqw = do 
+  q <- mkQbit False
+  measQbit q
+
 -- | Initialise a qubit in the |+> state. This is done by applying a Hadamard
 -- gate to the |0> state.    
 qPlus :: QIO Qbit
@@ -34,8 +40,7 @@ qMinus  =  do  qa <- q1
 -- | Create a random Boolean value, by measuring the state |+> 
 randBit :: QIO Bool
 randBit  =  do  qa <- qPlus
-                x <- measQbit qa
-                return x
+                measQbit qa
 
 -- | This function can be used to "share" the state of one qubit, with another
 -- newly initialised qubit. This is not the same as "cloning", as the two qubits
@@ -44,8 +49,8 @@ randBit  =  do  qa <- qPlus
 -- depending on the state of the given qubit.
 share :: Qbit -> QIO Qbit
 share  qa  =  do  qb <- q0
-                  applyU (cond qa (\a -> if a then (unot qb)
-                                              else (mempty)  )  )
+                  applyU (cond qa (\a -> if a then unot qb
+                                              else mempty  )  )
                   return qb
 
 -- | A Bell state can be created by sharing the |+> state
@@ -58,30 +63,27 @@ bell = do  qa <- qPlus
 -- of Booleans will always be in the same state as one another.
 test_bell :: QIO (Bool,Bool)
 test_bell  =  do  qb <- bell
-                  b <- measQ qb
-                  return b
+                  measQ qb
 
--- | This function initiaslised a qubit in the state corresponding to the given
+-- | This function initialises a qubit in the state corresponding to the given
 -- Boolean value. The Hadamard transform (which is self-inverse) is applied to
 -- the qubit twice, and then the qubit is measured. This should correspond to
 -- the identity function on the given Boolean value.
 hadTwice :: Bool -> QIO Bool
-hadTwice x = do 
+hadTwice x = do
   q <- mkQ x
   applyU (uhad q `mappend` uhad q)
-  b <- measQ q
-  return b
+  measQ q
 
 -- | A different implementation of 'hadTwice' where QIO is used to apply two
 -- unitaries, each of which is a single Hadamard gate, as opposed to a single
 -- unitary, which is two Hadamard gates. 
 hadTwice' :: Bool -> QIO Bool
-hadTwice' x = do 
+hadTwice' x = do
   q <- mkQ x
   applyU (uhad q)
   applyU (uhad q)
-  b <- measQ q
-  return b
+  measQ q
 
 ----------------------------------------------
 ---- Teleportation ---------------------------
@@ -90,23 +92,22 @@ hadTwice' x = do
 -- | The operations that Alice must perform in the classic quantum teleportation
 -- example.
 alice :: Qbit -> Qbit -> QIO (Bool,Bool)
-alice aq eq  =  do  
-  applyU (cond aq (\a -> if a then (unot eq) else (mempty)))
+alice aq eq  =  do
+  applyU (cond aq (\a -> if a then unot eq else mempty))
   applyU (uhad aq)
-  cd <- measQ (aq,eq)
-  return cd
+  measQ (aq,eq)
 
 -- | A definition of the Pauli-Z gate.
 uZZ :: Qbit -> U
-uZZ qb = (uphase qb pi)
+uZZ qb = uphase qb pi
 
 -- | The unitary operations that Bob must perform in the classic quantum
 -- teleportation example.
 bobsU :: (Bool,Bool) -> Qbit -> U
 bobsU  (False,False)  eq  =  mempty
-bobsU  (False,True)  eq  =  (unot eq)
-bobsU  (True,False)  eq  =  (uZZ eq)
-bobsU  (True,True)  eq  = ((unot eq) `mappend` (uZZ eq))
+bobsU  (False,True)  eq  =  unot eq
+bobsU  (True,False)  eq  =  uZZ eq
+bobsU  (True,True)  eq  = (unot eq) `mappend` (uZZ eq)
 
 -- | The overall operations that Bob must perform in the classic quantum
 -- teleportation example
@@ -118,41 +119,35 @@ bob eq cd  =  do  applyU (bobsU cd eq)
 teleportation :: Qbit -> QIO Qbit
 teleportation iq  =  do  (eq1,eq2) <- bell
                          cd <- alice iq eq1
-                         tq <- bob eq2 cd
-                         return tq
+                         bob eq2 cd
 
 -- | A small test function of quantum teleportation, which teleports a
 -- bell state, and then measures it.
 test_teleport :: QIO (Bool,Bool)
-test_teleport = do 
+test_teleport = do
   (q1,q2) <- bell
   tq2 <- teleportation q2
-  result <- measQ (q1,tq2)
-  return result
+  measQ (q1,tq2)
 
 -- | teleports a qubit in the state |1>
 teleport_true' :: QIO Qbit
 teleport_true' = do q <- q1
-                    tq <- teleportation q
-                    return tq
+                    teleportation q
 
 -- | teleports a qubit in the state |1>, and then measures it
 teleport_true :: QIO Bool
 teleport_true = do q <- teleport_true'
-                   result <- measQ q
-                   return result
+                   measQ q
 
 -- | teleports a qubit in the state |+>
 teleport_random' :: QIO Qbit
 teleport_random' = do q <- qPlus
-                      tq <- teleportation q
-                      return tq
+                      teleportation q
 
 -- | teleports a qubit in the state |+>, and then measures it.
 teleport_random :: QIO Bool
 teleport_random = do q <- teleport_random'
-                     result <- measQ q
-                     return result
+                     measQ q
 
 -----------------------------------------------
 ----- Deutsch's Algorithm ---------------------

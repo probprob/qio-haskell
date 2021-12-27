@@ -1,4 +1,3 @@
-
 -- | This module implements various functions that return a probabilistic result, 
 -- defined as unitary operators, and quantum computations.
 module QIO.QIORandom where
@@ -117,7 +116,8 @@ dice_rolls y = do
 occs :: [Int] -> (Int,Int,Int,Int,Int,Int)
 occs rs = (rs' 1,rs' 2,rs' 3,rs' 4,rs' 5,rs' 6)
   where 
-   rs' x = length ([y|y<-rs,y==x])
+-- "unterminated quasiquotation" -> space needed
+   rs' x = length [ y | y <-rs, y == x]
 
 -- | Returns the number of occurences of 1 through 6 in the given number of
 -- rolls of the dice.

@@ -18,5 +18,9 @@ Library
     base >= 4.9, containers, mtl, random, old-time
   Exposed-modules:
     QIO.Heap, QIO.QArith, QIO.QExamples, QIO.QIORandom, QIO.Qdata, QIO.Qft,
-    QIO.Qio, QIO.QioClass, QIO.QioSyn, QIO.QioSynAlt, QIO.Shor, QIO.Vec, QIO.VecEq
+    QIO.Qio, QIO.QioClass, QIO.QioSyn, QIO.Shor, QIO.Vec, QIO.VecEq
 
+executable shor
+  main-is: Main.hs
+  Build-Depends:		
+    base, containers, mtl , random, old-time, timeit

@@ -23,7 +23,7 @@ class VecEq v where
     (<@>) :: (Eq a, Num x) => a -> v x a -> x
     -- | The vector can be created from a list of pairs
     fromList  :: [(a,x)] -> v x a
-    -- | The cevtor can be converted into a list of pairs
+    -- | The vector can be converted into a list of pairs
     toList    :: v x a -> [(a,x)] 
 
 -- | This type is a wrapper around a list of pairs.
@@ -47,7 +47,7 @@ add (a,x) (VecEqL axs) = VecEqL (addV' axs)
 vEqPlus :: (Eq a, Num x) => VecEqL x a -> VecEqL x a -> VecEqL x a
 (VecEqL as) `vEqPlus` vbs = foldr add vbs as
 
--- | Scalar multiplcation is achieved by mapping the multiplication over
+-- | Scalar multiplication is achieved by mapping the multiplication over
 -- each pair in the vector. Multiplication by 0 is a special case, and will
 -- remove all the basis states from the vector.
 vEqTimes :: (Num x, Eq x) => x -> VecEqL x a -> VecEqL x a
@@ -55,7 +55,7 @@ l `vEqTimes` (VecEqL bs) | l==0 = VecEqL []
                          | otherwise = VecEqL (map (\ (b,k) -> (b,l*k)) bs)
           
 -- | The amplitude of an element can be found by looking through each element
--- until the matchinf one is found.
+-- until the matching one is found.
 vEqAt :: (Eq a, Num x) => a -> VecEqL x a -> x
 a `vEqAt` (VecEqL []) = 0
 a `vEqAt` (VecEqL ((a',b):abs)) | a == a' = b
@@ -77,7 +77,7 @@ class EqMonad m where
     eqReturn :: Eq a => a -> m a
     eqBind   :: (Eq a, Eq b) => m a -> (a -> m b) -> m b 
 
--- | Any VecEq over \v\, along with a Numeric tpye \x\ is an EqMonad.
+-- | Any VecEq over \v\, along with a Numeric type \x\ is an EqMonad.
 instance (VecEq v, Num x, Eq x) => EqMonad (v x) where
     eqReturn a = fromList [(a,1)]
     eqBind va f = case toList va of
@@ -108,7 +108,7 @@ instance EqMonad m => Monad (AsMonad m) where
 unEmbed :: Eq a => AsMonad m a -> m a
 unEmbed (Embed m) = m
 unEmbed (Return a) = eqReturn a
-unEmbed (Bind (Embed m) f) = m `eqBind` (unEmbed.f)
+unEmbed (Bind (Embed m) f) = m `eqBind` (unEmbed . f)
 unEmbed (Bind (Return a) f) = unEmbed (f a)
 unEmbed (Bind (Bind m f) g) = unEmbed (Bind m (\x -> Bind (f x) g))
 

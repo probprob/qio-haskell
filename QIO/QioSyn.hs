@@ -19,6 +19,8 @@ type CC = Complex RR
 -- | The amplitude of a complex number is the magnitude squared.
 amp :: CC -> RR
 amp k = (magnitude k)*(magnitude k)
+-- name clash: ( https://en.wikipedia.org/wiki/Probability_amplitude )
+        
 
 -- | The type of Qubits in QIO are simply integer references.
 newtype Qbit = Qbit Int deriving (Num, Enum, Eq, Ord)
@@ -33,7 +35,13 @@ data U = UReturn | Rot Qbit Rotation U
 
 -- | The underlying data type of a QIO Computation
 data QIO a = QReturn a | MkQbit Bool (Qbit -> QIO a) | ApplyU U (QIO a)
-           | Meas Qbit (Bool -> QIO a)
+           | Meas Qbit (Bool -> QIO a) 
+
+instance Show (QIO a) where
+    show (MkQbit a b) = "MkQBit: " ++ show a ++ "\n0: " ++ show (b (Qbit 0)) ++ "1: " ++ show (b (Qbit 1))
+    show (QReturn a) = "QReturn " 
+    show (ApplyU a b) = "ApplyU " ++ show a
+    show (Meas a b) = "Meas \n0: " ++ show (b False) ++ "1: " ++ show (b True)
 
 
 -- | The type "U" forms a Monoid
