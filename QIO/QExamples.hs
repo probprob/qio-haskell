@@ -13,14 +13,14 @@ import QIO.Qio
 q0 :: QIO Qbit
 q0 = mkQ False
 
+
 -- | Initialise a qubit in the |1> state
 q1 :: QIO Qbit
 q1  =  mkQ True
 
--- | (Paper)
-hqw :: QIO Bool
-hqw = do 
-  q <- mkQbit False
+hqw :: Bool -> QIO Bool
+hqw b = do 
+  q <- mkQbit b
   measQbit q
 
 -- | Initialise a qubit in the |+> state. This is done by applying a Hadamard
@@ -37,6 +37,8 @@ qMinus  =  do  qa <- q1
                applyU (uhad qa)
                return qa
 
+-- 4
+
 -- | Create a random Boolean value, by measuring the state |+> 
 randBit :: QIO Bool
 randBit  =  do  qa <- qPlus
@@ -52,6 +54,9 @@ share  qa  =  do  qb <- q0
                   applyU (cond qa (\a -> if a then unot qb
                                               else mempty  )  )
                   return qb
+
+
+
 
 -- | A Bell state can be created by sharing the |+> state
 bell :: QIO (Qbit, Qbit)

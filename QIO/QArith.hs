@@ -79,7 +79,7 @@ adder (QInt qas) (QInt qbs) qc = addBits qas qbs qc
 
 -- | A small function to test the adder unitary
 tadder :: (Int,(Int,Bool)) -> QIO (Int,(Int,Bool))
-tadder xyc = do q @ (qx,(qy,qc)) <- mkQ xyc
+tadder xyc = do q@(qx,(qy,qc)) <- mkQ xyc
                 applyU (adder qx qy qc)
                 xyc <- measQ q
                 return xyc
@@ -87,7 +87,7 @@ tadder xyc = do q @ (qx,(qy,qc)) <- mkQ xyc
 -- | A small function to test applying the adder unitary in reverse, ie.
 -- this defines subtraction.
 tRadder :: (Int,(Int,Bool)) -> QIO (Int,(Int,Bool))
-tRadder xyc = do q @ (qx,(qy,qc)) <- mkQ xyc
+tRadder xyc = do q@(qx,(qy,qc)) <- mkQ xyc
                  applyU (urev (adder qx qy qc))
                  xyc <- measQ q
                  return xyc
@@ -96,7 +96,7 @@ tRadder xyc = do q @ (qx,(qy,qc)) <- mkQ xyc
 -- the reverse of the adder unitary, which should give the identity function.
 tBiAdder :: (Int,(Int,Bool)) -> QIO (Int,(Int,Bool))
 tBiAdder xyc = do 
-  q @ (qx,(qy,qc)) <- mkQ xyc
+  q@(qx,(qy,qc)) <- mkQ xyc
   applyU (adder qx qy qc)
   applyU (urev (adder qx qy qc))
   xyc <- measQ q
@@ -127,7 +127,7 @@ adderMod n qa qb =
 
 -- | A small function to test the modular addition unitary.
 tadderMod :: Int -> (Int,Int) -> QIO (Int,Int)
-tadderMod n ab = do q @ (qa,qb) <- mkQ ab
+tadderMod n ab = do q@(qa,qb) <- mkQ ab
                     applyU (adderMod n qa qb)
                     ab <- measQ q
                     return ab

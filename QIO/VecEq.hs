@@ -39,7 +39,7 @@ vEqZero = VecEqL []
 add :: (Eq a,Num x) => (a,x) -> VecEqL x a -> VecEqL x a
 add (a,x) (VecEqL axs) = VecEqL (addV' axs)
     where addV' [] = [(a,x)]
-          addV' ((by @ (b,y)):bys) | a == b = (b,x+y):bys
+          addV' ((by@(b,y)):bys) | a == b = (b,x+y):bys
                                    | otherwise = by:(addV' bys)
 
 -- | Combining two vectors is achieved by folding the add operation over
